@@ -38,14 +38,24 @@ export const createTodo = async (req, res) => {
 // Update todo
 export const updateTodo = async (req, res) => {
   try {
+    const { title, description, dueDate, completed } = req.body;
     const todo = await Todo.findById(req.params.id);
-    if (req.body.title != null) todo.title = req.body.title;
-    if (req.body.descriptio != null) todo.description = req.body.description;
-    if (req.body.dueDate != null) todo.dueDate = req.body.dueDate;
-    if (req.body.completed != null) todo.completed = req.body.completed;
+
+    if (!todo) {
+      return res.status(404).json({ message: "Todo not found" });
+    }
+
+    // Update fields only if they are provided in the request
+    if (title !== undefined) todo.title = title;
+    if (description !== undefined) todo.description = description;
+    if (dueDate !== undefined) todo.dueDate = dueDate;
+    if (completed !== undefined) todo.completed = completed;
+
     const updatedTodo = await todo.save();
     res.status(200).json({ updatedTodo, message: "Todo updated successfully" });
-  } catch (error) {}
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 // Delete todo
@@ -55,11 +65,9 @@ export const deleteTodo = async (req, res) => {
     if (!todo) {
       return res.status(404).json({ message: "Todo not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: `Todo '${todo.title}' (ID: ${todo._id}) deleted successfully`,
-      });
+    res.status(200).json({
+      message: `Todo '${todo.title}' (ID: ${todo._id}) deleted successfully`,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
