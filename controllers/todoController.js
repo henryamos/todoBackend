@@ -2,7 +2,7 @@ import Todo from "../models/Todo.js";
 
 //Get all todos
 export const getTodos = async (req, res) => {
-  const { page = 1, limit = 15, search = "" } = req.query;
+  const { page = 1, limit = 5, search = "" } = req.query;
   try {
     const todos = await Todo.find({ title: new RegExp(search, "i") })
       .sort({ createdAt: -1 })
